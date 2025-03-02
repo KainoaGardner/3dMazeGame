@@ -10,7 +10,7 @@ const wallTextures = new Array(12)
   .fill(null)
   .map(() => Array(texWidth).fill(0));
 
-const bgTextures = new Array(3).fill(null).map(() => Array(texWidth).fill(0));
+const bgTextures = new Array(5).fill(null).map(() => Array(texWidth).fill(0));
 
 const spriteTextures = new Array(2)
   .fill(null)
@@ -36,12 +36,39 @@ if (roofTex instanceof HTMLElement) {
   });
 }
 
+const tileTexList = new Array(texWidth).fill(null).map(() => Array(3).fill(0));
+const tileTex = new Image();
+if (tileTex instanceof HTMLElement) {
+  tileTex.src = "/img/bg/floor0.png";
+  tileTex.addEventListener("load", function () {
+    getTexture(tileTex, tileTexList, 3, texWidth, texHeight, bgTextures);
+  });
+}
+
+const firePlanksTexList = new Array(texWidth)
+  .fill(null)
+  .map(() => Array(3).fill(0));
+const firePlanksTex = new Image();
+if (firePlanksTex instanceof HTMLElement) {
+  firePlanksTex.src = "/img/bg/floor2.png";
+  firePlanksTex.addEventListener("load", function () {
+    getTexture(
+      firePlanksTex,
+      firePlanksTexList,
+      4,
+      texWidth,
+      texHeight,
+      bgTextures,
+    );
+  });
+}
+
 const planksTexList = new Array(texWidth)
   .fill(null)
   .map(() => Array(3).fill(0));
 const planksTex = new Image();
 if (planksTex instanceof HTMLElement) {
-  planksTex.src = "/img/bg/floor.png";
+  planksTex.src = "/img/bg/floor1.png";
   planksTex.addEventListener("load", function () {
     getTexture(planksTex, planksTexList, 2, texWidth, texHeight, bgTextures);
   });
@@ -77,7 +104,7 @@ if (wallTex instanceof HTMLElement) {
   wallTex.src = "/img/walls/stone.png";
   wallTex.addEventListener("load", function () {
     getTexture(wallTex, wallTexList, 0, texWidth, texHeight, wallTextures);
-    getTexture(wallTex, wallTexList, 8, texWidth, texHeight, wallTextures);
+    getTexture(wallTex, wallTexList, 1, texWidth, texHeight, wallTextures);
   });
 }
 
@@ -234,6 +261,15 @@ for (let i = 0; i < 4; i++) {
   }
 }
 
+const sheildImg = new Image();
+if (sheildImg instanceof HTMLElement) sheildImg.src = "/img/items/sheild.png";
+
+const hornImg = new Image();
+if (hornImg instanceof HTMLElement) hornImg.src = "/img/items/horn.png";
+
+const hornOnImg = new Image();
+if (hornOnImg instanceof HTMLElement) hornOnImg.src = "/img/items/hornon.png";
+
 // const sword0Img = new Image();
 // if (sword0Img instanceof HTMLElement) sword0Img.src = "/img/items/sword0.png";
 // const sword1Img = new Image();
@@ -253,6 +289,17 @@ if (flashLightInvImg instanceof HTMLElement)
 
 const gunInvImg = new Image();
 if (gunInvImg instanceof HTMLElement) gunInvImg.src = "/img/items/gun-inv.png";
+
+const dashInvImg = new Image();
+if (dashInvImg instanceof HTMLElement) dashInvImg.src = "/img/items/dash.png";
+
+const hornInvImg = new Image();
+if (hornInvImg instanceof HTMLElement)
+  hornInvImg.src = "/img/items/horn-inv.png";
+
+const sheildInvImg = new Image();
+if (sheildInvImg instanceof HTMLElement)
+  sheildInvImg.src = "/img/items/sheild-inv.png";
 
 const shootImgs: any[] = [];
 
@@ -278,8 +325,14 @@ export {
   gunImg,
   swordImgs,
   swordInvImg,
+  sheildImg,
+  sheildInvImg,
+  hornImg,
+  hornOnImg,
+  hornInvImg,
   flashlightImg,
   gunInvImg,
+  dashInvImg,
   flashLightInvImg,
   flashlightoffImg,
   shootImgs,

@@ -10,11 +10,11 @@ const targetFps = 30;
 // canvas.width = 1920;
 // canvas.height = 1080;
 
-canvas.width = 1366;
-canvas.height = 768;
+// canvas.width = 1366;
+// canvas.height = 768;
 
-// canvas.width = 1280;
-// canvas.height = 720;
+canvas.width = 1280;
+canvas.height = 720;
 
 // canvas.width = 854;
 // canvas.height = 480;

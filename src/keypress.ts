@@ -14,6 +14,7 @@ keyMap.set("Digit1", false);
 keyMap.set("Digit2", false);
 keyMap.set("Digit3", false);
 keyMap.set("Digit4", false);
+keyMap.set("Digit5", false);
 
 window.addEventListener("keydown", keyDown, false);
 window.addEventListener("keyup", keyUp, false);

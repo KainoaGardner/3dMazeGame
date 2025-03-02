@@ -14,8 +14,14 @@ import {
   spriteTextures,
   gunImg,
   gunInvImg,
+  sheildImg,
+  sheildInvImg,
+  hornInvImg,
+  hornImg,
+  hornOnImg,
   swordImgs,
   swordInvImg,
+  dashInvImg,
   flashlightImg,
   flashlightoffImg,
   flashLightInvImg,
@@ -50,7 +56,7 @@ interface distanceOutput {
   distance: number;
   texX: number;
   wallType: number;
-  goalDistance: number;
+  otherDistance: number;
   pos: pos;
 }
 
@@ -81,6 +87,7 @@ export class Player {
 
   inventory: playerInv;
 
+  private dashCount = 0;
   private reflect: boolean = false;
   private running: boolean = false;
   private tired: boolean = false;
@@ -90,12 +97,13 @@ export class Player {
   private battery: number = 1000;
   private flashlight: boolean = true;
 
+  private sheild: boolean = false;
   private swordHit: boolean = false;
   private useCounter = 0;
   ammo: number = 10;
   private ammoCounter = 0;
 
-  private holding: number = 1;
+  holding: number = 1;
   //0 nothing 3 gun 1 flashlight 2 sword
 
   constructor(
@@ -202,7 +210,7 @@ export class Player {
     c.stroke();
   }
 
-  private drawBG() {
+  private drawBG(floorTex: number, ceilingTex: number) {
     c.fillStyle = "black";
     c.fillRect(0, 0, canvas.width, canvas.height);
     for (let y = 0; y < bufferHeight; y++) {
@@ -232,10 +240,10 @@ export class Player {
         floorX += floorStepX;
         floorY += floorStepY;
 
-        let color = bgTextures[2][texWidth * tY + tX];
+        let color = bgTextures[floorTex][texWidth * tY + tX];
         buffer[y][x] = color;
 
-        color = bgTextures[1][texWidth * tY + tX];
+        color = bgTextures[ceilingTex][texWidth * tY + tX];
         buffer[bufferHeight - y - 1][x] = color;
       }
     }
@@ -312,7 +320,7 @@ export class Player {
     }
   }
 
-  private drawBGLight(levelBrightness: number) {
+  private drawBGLight(levelBrightness: number, level: number) {
     c.fillStyle = "black";
     for (let y = 0; y < bufferHeight / 2; y++) {
       let brightness: number;
@@ -320,12 +328,23 @@ export class Player {
         this.viewDist === 64 ||
         (this.useCounter > 0 && this.useCounter < 15 && this.holding === 3)
       ) {
-        brightness = ((y - levelBrightness) / (bufferHeight / 2)) * 5;
+        if (level === 4) {
+          brightness =
+            ((y - levelBrightness) / (bufferHeight / 2)) *
+            ((y - levelBrightness) / (bufferHeight / 2)) *
+            2;
+        } else {
+          brightness = ((y - levelBrightness) / (bufferHeight / 2)) * 5;
+        }
       } else {
-        brightness = (y - levelBrightness) / (bufferHeight / 2);
-        // brightness =
-        //   ((y - levelBrightness) / (bufferHeight / 2)) *
-        //   ((y - levelBrightness) / (bufferHeight / 2));
+        if (level === 4) {
+          brightness =
+            (((y - levelBrightness) / (bufferHeight / 2)) *
+              ((y - levelBrightness) / (bufferHeight / 2))) /
+            3;
+        } else {
+          brightness = (y - levelBrightness) / (bufferHeight / 2);
+        }
 
         // brightness = y / (bufferHeight * levelBrightness);
       }
@@ -401,6 +420,19 @@ export class Player {
         let color = wallTextures[texNum][texHeight * texY + result.texX];
         buffer[y][x] = color;
       }
+
+      // if (result.otherDistance !== -1) {
+      //   const otherHeight = Math.floor(canvas.height / result.otherDistance);
+      //   c.globalAlpha = 1;
+      //   c.fillStyle = "black";
+      //   c.fillRect(
+      //     x * bufferRatio,
+      //     canvas.height / 2 - otherHeight / 2,
+      //     bufferRatio,
+      //     otherHeight,
+      //   );
+      // }
+      // c.globalAlpha = 1;
     }
   }
 
@@ -412,45 +444,39 @@ export class Player {
     }
 
     if (this.useCounter > 0 && this.useCounter < 35 && this.reflect) {
-      c.fillStyle = "white";
-      c.strokeStyle = "white";
-      c.lineWidth = 10;
+      c.strokeStyle = "#e74c3c";
+
+      c.lineWidth = 1000;
       c.beginPath();
       c.arc(
         canvas.width / 2,
         canvas.height / 2,
-        (canvas.height / 100) * this.useCounter,
+        UIRatio * this.useCounter * this.useCounter,
         0,
         2 * Math.PI,
       );
 
-      c.globalAlpha = 0.3;
-      c.fill();
+      c.globalAlpha = 0.75;
 
-      c.globalAlpha = 1;
       c.stroke();
+      c.globalAlpha = 1;
     }
   }
 
-  drawView(
-    map: number[][],
-    lights: pos[],
-    sprites: sprite[],
-    levelBrightness: number,
-  ) {
+  drawView(ls: levelSettings) {
     this.clearBuffer();
-    this.drawBG();
+    this.drawBG(ls.floorTex, ls.ceilingTex);
     this.drawBuffer();
-    this.drawBGLight(levelBrightness);
+    this.drawBGLight(ls.map.brightness, ls.level);
 
     this.clearBuffer();
     this.clearLightBuffer();
-    this.drawWalls(map, lights, levelBrightness, sprites);
+    this.drawWalls(ls.map.map, ls.map.lightList, ls.map.brightness, ls.sprites);
     this.drawBuffer();
     this.drawLightBuffer();
 
     this.clearBuffer();
-    this.drawSprites(sprites);
+    this.drawSprites(ls.sprites);
     this.drawBuffer();
   }
 
@@ -510,7 +536,7 @@ export class Player {
       distance: -1,
       texX: -1,
       wallType: -1,
-      goalDistance: -1,
+      otherDistance: -1,
       pos: { x: -1, y: -1 },
     };
 
@@ -559,7 +585,14 @@ export class Player {
         mapY += stepY;
         side = 1;
       }
-      if (map[mapX][mapY] !== 0) {
+      if (map[mapX][mapY] === 3) {
+        if (side === 0) {
+          result.otherDistance = sideDistX - deltaDistX;
+        } else {
+          result.otherDistance = sideDistY - deltaDistY;
+        }
+      }
+      if (map[mapX][mapY] !== 0 && map[mapX][mapY] !== 3) {
         hit = 1;
       }
     }
@@ -674,7 +707,7 @@ export class Player {
           UIRatio * 128,
           UIRatio * 128,
         );
-      } else if (this.useCounter > 20 && this.useCounter < 40) {
+      } else if (this.useCounter > 19 && this.useCounter < 40) {
         c.drawImage(
           swordImgs[1],
           canvas.width / 2 - 64 * UIRatio,
@@ -699,6 +732,42 @@ export class Player {
           UIRatio * 128,
         );
       }
+    } else if (this.holding === 4 && this.inventory.sheild) {
+      if (this.sheild) {
+        c.drawImage(
+          sheildImg,
+          canvas.width / 2 - 64 * UIRatio,
+          canvas.height - 100 * UIRatio + recoil + running,
+          128 * UIRatio,
+          128 * UIRatio,
+        );
+      } else {
+        c.drawImage(
+          sheildImg,
+          canvas.width / 2 - 64 * UIRatio,
+          canvas.height - 32 * UIRatio + recoil + running,
+          128 * UIRatio,
+          128 * UIRatio,
+        );
+      }
+    } else if (this.holding === 5) {
+      if (keyMap.get("Space")) {
+        c.drawImage(
+          hornOnImg,
+          canvas.width / 2 - 28 * UIRatio,
+          canvas.height - 56 * UIRatio + recoil + running,
+          56 * UIRatio,
+          56 * UIRatio,
+        );
+      } else {
+        c.drawImage(
+          hornImg,
+          canvas.width / 2 - 28 * UIRatio,
+          canvas.height - 56 * UIRatio + recoil + running,
+          56 * UIRatio,
+          56 * UIRatio,
+        );
+      }
     }
 
     if (this.holding === 2 || this.holding === 3) {
@@ -709,6 +778,17 @@ export class Player {
         (this.useCounter * UIRatio) / 5,
         2 * UIRatio,
       );
+    }
+    if (this.inventory.dash) {
+      if (this.dashCount !== 0) {
+        c.fillStyle = "#ecf0f1";
+        c.fillRect(
+          canvas.width / 2 - (25 * UIRatio * 2) / 5,
+          canvas.height - 10 * UIRatio,
+          (this.dashCount * UIRatio * 2) / 5,
+          2 * UIRatio,
+        );
+      }
     }
   }
 
@@ -761,6 +841,33 @@ export class Player {
       );
     }
 
+    if (this.inventory.sheild) {
+      c.fillRect(
+        68 * UIRatio,
+        canvas.height - 22 * UIRatio,
+        20 * UIRatio,
+        20 * UIRatio,
+      );
+    }
+
+    if (this.inventory.horn) {
+      c.fillRect(
+        canvas.width - 96 * UIRatio,
+        canvas.height - 22 * UIRatio,
+        20 * UIRatio,
+        20 * UIRatio,
+      );
+    }
+
+    if (this.inventory.dash) {
+      c.fillRect(
+        canvas.width - 74 * UIRatio,
+        canvas.height - 22 * UIRatio,
+        20 * UIRatio,
+        20 * UIRatio,
+      );
+    }
+
     c.globalAlpha = 0.75;
     c.fillStyle = "black";
     if (this.inventory.flashlight) {
@@ -795,8 +902,29 @@ export class Player {
       }
     }
 
+    if (this.inventory.sheild) {
+      if (this.holding !== 4) {
+        c.fillRect(
+          68 * UIRatio,
+          canvas.height - 22 * UIRatio,
+          20 * UIRatio,
+          20 * UIRatio,
+        );
+      }
+    }
+
+    if (this.inventory.horn) {
+      if (this.holding !== 5) {
+        c.fillRect(
+          canvas.width - 96 * UIRatio,
+          canvas.height - 22 * UIRatio,
+          20 * UIRatio,
+          20 * UIRatio,
+        );
+      }
+    }
+
     c.globalAlpha = 1;
-    c.drawImage;
 
     if (this.inventory.flashlight) {
       c.drawImage(
@@ -827,6 +955,46 @@ export class Player {
       );
     }
 
+    if (this.inventory.sheild) {
+      c.drawImage(
+        sheildInvImg,
+        68 * UIRatio,
+        canvas.height - 22 * UIRatio,
+        20 * UIRatio,
+        20 * UIRatio,
+      );
+    }
+
+    if (this.inventory.horn) {
+      c.drawImage(
+        hornInvImg,
+        canvas.width - 95 * UIRatio,
+        canvas.height - 21.5 * UIRatio,
+        19 * UIRatio,
+        19 * UIRatio,
+      );
+    }
+
+    if (this.inventory.dash) {
+      c.drawImage(
+        dashInvImg,
+        canvas.width - 74 * UIRatio,
+        canvas.height - 21 * UIRatio,
+        20 * UIRatio,
+        20 * UIRatio,
+      );
+    }
+    c.globalAlpha = 0.75;
+    c.fillStyle = "black";
+    if (this.dashCount > 0) {
+      c.fillRect(
+        canvas.width - 74 * UIRatio,
+        canvas.height - 22 * UIRatio,
+        20 * UIRatio,
+        20 * UIRatio,
+      );
+    }
+
     c.globalAlpha = 1;
     c.fillStyle = "#e74c3c";
     c.font = "bold 35px Arial";
@@ -840,7 +1008,15 @@ export class Player {
     }
 
     if (this.inventory.gun) {
-      c.fillText("3", 48 * UIRatio, canvas.height - 5 * UIRatio);
+      c.fillText("3", 49 * UIRatio, canvas.height - 5 * UIRatio);
+    }
+
+    if (this.inventory.sheild) {
+      c.fillText("4", 71 * UIRatio, canvas.height - 5 * UIRatio);
+    }
+
+    if (this.inventory.horn) {
+      c.fillText("5", canvas.width - 93 * UIRatio, canvas.height - 5 * UIRatio);
     }
 
     c.globalAlpha = 1;
@@ -868,6 +1044,33 @@ export class Player {
     if (this.holding === 3 && this.inventory.gun) {
       c.rect(
         46 * UIRatio,
+        canvas.height - 22 * UIRatio,
+        20 * UIRatio,
+        20 * UIRatio,
+      );
+      c.stroke();
+    }
+    if (this.holding === 4 && this.inventory.sheild) {
+      c.rect(
+        68 * UIRatio,
+        canvas.height - 22 * UIRatio,
+        20 * UIRatio,
+        20 * UIRatio,
+      );
+      c.stroke();
+    }
+    if (this.holding === 5 && this.inventory.horn) {
+      c.rect(
+        canvas.width - 96 * UIRatio,
+        canvas.height - 22 * UIRatio,
+        20 * UIRatio,
+        20 * UIRatio,
+      );
+      c.stroke();
+    }
+    if (this.dashCount === 0 && this.inventory.dash) {
+      c.rect(
+        canvas.width - 74 * UIRatio,
         canvas.height - 22 * UIRatio,
         20 * UIRatio,
         20 * UIRatio,
@@ -940,7 +1143,15 @@ export class Player {
   }
 
   private drawRunUi() {
-    if (this.running) {
+    if (
+      this.running ||
+      (this.dashCount > 0 &&
+        this.dashCount < 10 &&
+        (keyMap.get("ArrowUp") ||
+          keyMap.get("ArrowDown") ||
+          keyMap.get("KeyW") ||
+          keyMap.get("KeyS")))
+    ) {
       c.globalAlpha = 0.75;
       c.lineWidth = 100;
       c.strokeStyle = "black";
@@ -969,34 +1180,50 @@ export class Player {
     c.globalAlpha = 1;
   }
 
-  // private drawLevelUi(level: number) {
-  //   c.fillStyle = "#241d1d";
-  //   c.fillRect(0, 0, 20 * UIRatio, 20 * UIRatio);
-  //
-  //   c.fillStyle = "red";
-  //   c.font = "bold 75px Arial";
-  //   c.fillText("" + level, 10 * UIRatio, 10 * UIRatio);
-  // }
+  private drawDashUi() {
+    c.strokeStyle = "black";
+    c.lineWidth = 1000;
+    c.globalAlpha = 0.8;
+    if (
+      this.dashCount > 0 &&
+      this.dashCount < 5 &&
+      (keyMap.get("ArrowUp") ||
+        keyMap.get("ArrowDown") ||
+        keyMap.get("KeyW") ||
+        keyMap.get("KeyS"))
+    ) {
+      c.beginPath();
+      c.arc(
+        canvas.width / 2,
+        canvas.height / 2,
+        this.dashCount * this.dashCount * UIRatio * 10,
+        0,
+        2 * Math.PI,
+      );
+      c.stroke();
+    }
+    c.globalAlpha = 1;
+  }
 
   drawUi(map: number[][]) {
     this.drawHoldingEffectUi();
-    this.drawFlashBeamUi();
+    if (!this.running) this.drawFlashBeamUi();
 
     if (this.inventory.run) this.drawRunUi();
     this.drawInBlockUi(map);
-
-    this.drawInvUi();
 
     if (this.inventory.gun) this.drawAmmoUi();
     if (this.inventory.gun && this.holding === 3) this.drawShootingUi();
 
     // this.drawLevelUi(level);
+    if (this.inventory.dash) this.drawDashUi();
 
     if (this.inventory.flashlight) this.drawBatteryUi();
     if (this.inventory.run) this.drawStaminaUi();
     this.drawHealthUi();
 
     this.drawHoldingUi();
+    this.drawInvUi();
   }
 
   private useUpdate() {
@@ -1022,23 +1249,46 @@ export class Player {
             this.useCounter = 1;
           }
         }
+
+        if (this.holding === 4) {
+          this.sheild = true;
+        }
       }
     }
   }
 
   private moveUpdate(map: number[][]) {
+    if (!this.inventory.run) {
+      this.speed = this.walkSpeed;
+      this.running = false;
+    }
     if (
       this.inventory.run &&
       keyMap.get("ShiftLeft") &&
-      (keyMap.get("ArrowUp") || keyMap.get("KeyW")) &&
+      (keyMap.get("ArrowUp") ||
+        keyMap.get("KeyW") ||
+        keyMap.get("ArrowDown") ||
+        keyMap.get("KeyS")) &&
       !this.tired &&
       this.stamina > 0
     ) {
       this.speed = this.walkSpeed * 2;
       this.running = true;
       this.stamina -= 5;
+    }
 
-      keyMap.set("Space", false);
+    if (
+      keyMap.get("ShiftLeft") &&
+      this.dashCount === 0 &&
+      keyMap.get("Space") &&
+      (keyMap.get("ArrowUp") ||
+        keyMap.get("ArrowDown") ||
+        keyMap.get("KeyW") ||
+        keyMap.get("KeyS"))
+    ) {
+      if (this.inventory.dash) {
+        this.dashCount = 1;
+      }
     }
 
     if (keyMap.get("ArrowUp") || keyMap.get("KeyW")) {
@@ -1051,10 +1301,10 @@ export class Player {
           Math.floor(this.posY + this.dirY * this.speed * this.radius)
         ];
 
-      if (forwardX === 0 || forwardX === 4) {
+      if (forwardX === 0 || forwardX === 4 || forwardX === 3) {
         this.posX += this.dirX * this.speed;
       }
-      if (forwardY === 0 || forwardY === 4) {
+      if (forwardY === 0 || forwardY === 4 || forwardY === 3) {
         this.posY += this.dirY * this.speed;
       }
     }
@@ -1069,10 +1319,10 @@ export class Player {
       ];
 
     if (keyMap.get("ArrowDown") || keyMap.get("KeyS")) {
-      if (backwardX === 0 || backwardX === 4) {
+      if (backwardX === 0 || backwardX === 4 || backwardX === 3) {
         this.posY -= this.dirY * this.speed;
       }
-      if (backwardY === 0 || backwardY === 4) {
+      if (backwardY === 0 || backwardY === 4 || backwardY === 3) {
         this.posX -= this.dirX * this.speed;
       }
     }
@@ -1128,6 +1378,16 @@ export class Player {
       this.useCounter = 80;
       this.reflect = false;
       this.swordHit = false;
+    } else if (keyMap.get("Digit4") && this.inventory.sheild) {
+      this.holding = 4;
+      this.useCounter = 80;
+      this.reflect = false;
+      this.swordHit = false;
+    } else if (keyMap.get("Digit5") && this.inventory.horn) {
+      this.holding = 5;
+      this.useCounter = 80;
+      this.reflect = false;
+      this.swordHit = false;
     }
   }
 
@@ -1143,12 +1403,12 @@ export class Player {
 
     if (this.useCounter !== 0 && this.useCounter < 100) {
       if (this.holding === 2) {
-        this.useCounter += 7;
+        this.useCounter += 5;
       } else if (this.holding === 3) {
         this.useCounter += 5;
       }
     }
-    if (this.useCounter >= 100 && !keyMap.get("Space")) {
+    if (this.useCounter >= 100) {
       this.swordHit = false;
       this.reflect = false;
       this.useCounter = 0;
@@ -1166,7 +1426,8 @@ export class Player {
     if (
       !this.flashlight ||
       (this.holding === 1 && !keyMap.get("Space")) ||
-      this.holding !== 1
+      this.holding !== 1 ||
+      this.running
     ) {
       this.viewDist = 16;
       if (this.battery < 1000) {
@@ -1291,17 +1552,92 @@ export class Player {
     }
   }
 
+  private dashUpdate(map: number[][]) {
+    if (this.dashCount !== 0 && this.dashCount < 50) {
+      this.dashCount++;
+    }
+    if (this.dashCount >= 50) {
+      this.dashCount = 0;
+    }
+
+    if (this.dashCount > 0 && this.dashCount < 5 && this.stamina > 15) {
+      this.stamina -= 15;
+      this.useCounter = 0;
+      this.swordHit = false;
+
+      for (let i = 0; i < 10; i++) {
+        if (keyMap.get("ArrowUp") || keyMap.get("KeyW")) {
+          const forwardX =
+            map[
+              Math.floor(this.posX + this.dirX * this.speed * this.radius * 1)
+            ][Math.floor(this.posY)];
+          const forwardY =
+            map[Math.floor(this.posX)][
+              Math.floor(this.posY + this.dirY * this.speed * this.radius * 1)
+            ];
+
+          if (forwardX === 0 || forwardX === 4) {
+            this.posX += this.dirX * this.speed;
+          }
+          if (forwardY === 0 || forwardY === 4) {
+            this.posY += this.dirY * this.speed;
+          }
+        } else if (keyMap.get("ArrowDown") || keyMap.get("KeyS")) {
+          const backwardX =
+            map[Math.floor(this.posX)][
+              Math.floor(this.posY - this.dirY * this.speed * this.radius)
+            ];
+          const backwardY =
+            map[Math.floor(this.posX - this.dirX * this.speed * this.radius)][
+              Math.floor(this.posY)
+            ];
+
+          if (keyMap.get("ArrowDown") || keyMap.get("KeyS")) {
+            if (backwardX === 0 || backwardX === 4) {
+              this.posY -= this.dirY * this.speed;
+            }
+            if (backwardY === 0 || backwardY === 4) {
+              this.posX -= this.dirX * this.speed;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private hiddenBlockUpdate(map: Map) {
+    for (let i = 0; i < map.map.length; i++) {
+      for (let j = 0; j < map.map[0].length; j++) {
+        const block = map.map[i][j];
+        if (block === 2 && this.holding === 1 && this.viewDist === 64) {
+          map.map[i][j] = 3;
+        } else if (block === 3 && this.viewDist !== 64) {
+          map.map[i][j] = 2;
+        }
+      }
+    }
+  }
+
+  private sheildUpdate() {
+    if (this.sheild && !keyMap.get("Space")) {
+      this.sheild = false;
+    }
+  }
+
   update(ls: levelSettings): void {
     this.useUpdate();
 
     //seperate gun and sword update
     // if (this.inventory.gun) this.gunUpdate();
     this.gunUpdate();
-    this.flashlightUpdate();
-
+    if (this.inventory.flashlight) this.flashlightUpdate();
+    if (this.inventory.flashlight) this.hiddenBlockUpdate(ls.map);
     if (this.inventory.sword) this.swordUpdate(ls);
 
     if (this.inventory.run) this.staminaUpdate();
+    if (this.inventory.dash) this.dashUpdate(ls.map.map);
+    if (this.inventory.sheild) this.sheildUpdate();
+
     this.moveUpdate(ls.map.map);
     this.holdingUpdate();
     this.inblockUpdate(ls.map.map);
