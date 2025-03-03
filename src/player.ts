@@ -25,6 +25,8 @@ import {
   flashlightImg,
   flashlightoffImg,
   flashLightInvImg,
+  clockInvImg,
+  clockPlacedInvImg,
   shootImgs,
   ammoImg,
 } from "./textures";
@@ -35,6 +37,7 @@ import {
   swordSounds,
   reflectSound,
   mineSound,
+  hitSound,
 } from "./sounds";
 
 import {
@@ -68,6 +71,11 @@ interface playerInv {
   sword: boolean;
   sheild: boolean;
   dash: boolean;
+  teleport: boolean;
+}
+
+export class Teleport {
+  alive = true;
 }
 
 export class Player {
@@ -86,6 +94,13 @@ export class Player {
   stamina: number = 1000;
 
   inventory: playerInv;
+
+  private teleportPlaced: boolean = false;
+  private teleportX = 0;
+  private teleportY = 0;
+
+  private hit: number = 0;
+  private fireballHit: number = 0;
 
   private dashCount = 0;
   private reflect: boolean = false;
@@ -676,7 +691,7 @@ export class Player {
       c.drawImage(
         gunImg,
         canvas.width / 2 - 28 * UIRatio,
-        canvas.height - 52 * UIRatio + recoil + running,
+        canvas.height - 52 * UIRatio + recoil * 2 + running,
         56 * UIRatio,
         56 * UIRatio,
       );
@@ -779,17 +794,6 @@ export class Player {
         2 * UIRatio,
       );
     }
-    if (this.inventory.dash) {
-      if (this.dashCount !== 0) {
-        c.fillStyle = "#ecf0f1";
-        c.fillRect(
-          canvas.width / 2 - (25 * UIRatio * 2) / 5,
-          canvas.height - 10 * UIRatio,
-          (this.dashCount * UIRatio * 2) / 5,
-          2 * UIRatio,
-        );
-      }
-    }
   }
 
   private drawShootingUi() {
@@ -823,45 +827,50 @@ export class Player {
         20 * UIRatio,
       );
     }
+
     if (this.inventory.sword) {
       c.fillRect(
-        24 * UIRatio,
+        22 * UIRatio,
         canvas.height - 22 * UIRatio,
         20 * UIRatio,
         20 * UIRatio,
       );
     }
-
     if (this.inventory.gun) {
       c.fillRect(
-        46 * UIRatio,
+        42 * UIRatio,
         canvas.height - 22 * UIRatio,
         20 * UIRatio,
         20 * UIRatio,
       );
     }
-
     if (this.inventory.sheild) {
       c.fillRect(
-        68 * UIRatio,
+        62 * UIRatio,
         canvas.height - 22 * UIRatio,
         20 * UIRatio,
         20 * UIRatio,
       );
     }
-
     if (this.inventory.horn) {
       c.fillRect(
-        canvas.width - 96 * UIRatio,
+        82 * UIRatio,
         canvas.height - 22 * UIRatio,
         20 * UIRatio,
         20 * UIRatio,
       );
     }
-
     if (this.inventory.dash) {
       c.fillRect(
-        canvas.width - 74 * UIRatio,
+        canvas.width - 82 * UIRatio,
+        canvas.height - 22 * UIRatio,
+        20 * UIRatio,
+        20 * UIRatio,
+      );
+    }
+    if (this.inventory.teleport) {
+      c.fillRect(
+        canvas.width - 102 * UIRatio,
         canvas.height - 22 * UIRatio,
         20 * UIRatio,
         20 * UIRatio,
@@ -870,58 +879,48 @@ export class Player {
 
     c.globalAlpha = 0.75;
     c.fillStyle = "black";
-    if (this.inventory.flashlight) {
-      if (this.holding !== 1) {
-        c.fillRect(
-          2 * UIRatio,
-          canvas.height - 22 * UIRatio,
-          20 * UIRatio,
-          20 * UIRatio,
-        );
-      }
+    if (this.holding !== 1 && this.inventory.flashlight) {
+      c.fillRect(
+        2 * UIRatio,
+        canvas.height - 22 * UIRatio,
+        20 * UIRatio,
+        20 * UIRatio,
+      );
     }
-    if (this.inventory.sword) {
-      if (this.holding !== 2) {
-        c.fillRect(
-          24 * UIRatio,
-          canvas.height - 22 * UIRatio,
-          20 * UIRatio,
-          20 * UIRatio,
-        );
-      }
+    if (this.holding !== 2 && this.inventory.sword) {
+      c.fillRect(
+        22 * UIRatio,
+        canvas.height - 22 * UIRatio,
+        20 * UIRatio,
+        20 * UIRatio,
+      );
     }
 
-    if (this.inventory.gun) {
-      if (this.holding !== 3) {
-        c.fillRect(
-          46 * UIRatio,
-          canvas.height - 22 * UIRatio,
-          20 * UIRatio,
-          20 * UIRatio,
-        );
-      }
+    if (this.holding !== 3 && this.inventory.gun) {
+      c.fillRect(
+        42 * UIRatio,
+        canvas.height - 22 * UIRatio,
+        20 * UIRatio,
+        20 * UIRatio,
+      );
     }
 
-    if (this.inventory.sheild) {
-      if (this.holding !== 4) {
-        c.fillRect(
-          68 * UIRatio,
-          canvas.height - 22 * UIRatio,
-          20 * UIRatio,
-          20 * UIRatio,
-        );
-      }
+    if (this.holding !== 4 && this.inventory.sheild) {
+      c.fillRect(
+        62 * UIRatio,
+        canvas.height - 22 * UIRatio,
+        20 * UIRatio,
+        20 * UIRatio,
+      );
     }
 
-    if (this.inventory.horn) {
-      if (this.holding !== 5) {
-        c.fillRect(
-          canvas.width - 96 * UIRatio,
-          canvas.height - 22 * UIRatio,
-          20 * UIRatio,
-          20 * UIRatio,
-        );
-      }
+    if (this.holding !== 5 && this.inventory.horn) {
+      c.fillRect(
+        82 * UIRatio,
+        canvas.height - 22 * UIRatio,
+        20 * UIRatio,
+        20 * UIRatio,
+      );
     }
 
     c.globalAlpha = 1;
@@ -934,12 +933,13 @@ export class Player {
         20 * UIRatio,
         20 * UIRatio,
       );
+    } else {
     }
     if (this.inventory.sword) {
       c.drawImage(
         swordInvImg,
-        24 * UIRatio,
-        canvas.height - 21 * UIRatio,
+        22 * UIRatio,
+        canvas.height - 22 * UIRatio,
         20 * UIRatio,
         20 * UIRatio,
       );
@@ -948,7 +948,7 @@ export class Player {
     if (this.inventory.gun) {
       c.drawImage(
         gunInvImg,
-        46 * UIRatio,
+        42 * UIRatio,
         canvas.height - 21 * UIRatio,
         20 * UIRatio,
         20 * UIRatio,
@@ -958,7 +958,7 @@ export class Player {
     if (this.inventory.sheild) {
       c.drawImage(
         sheildInvImg,
-        68 * UIRatio,
+        62 * UIRatio,
         canvas.height - 22 * UIRatio,
         20 * UIRatio,
         20 * UIRatio,
@@ -968,7 +968,7 @@ export class Player {
     if (this.inventory.horn) {
       c.drawImage(
         hornInvImg,
-        canvas.width - 95 * UIRatio,
+        82 * UIRatio,
         canvas.height - 21.5 * UIRatio,
         19 * UIRatio,
         19 * UIRatio,
@@ -978,20 +978,40 @@ export class Player {
     if (this.inventory.dash) {
       c.drawImage(
         dashInvImg,
-        canvas.width - 74 * UIRatio,
+        canvas.width - 82 * UIRatio,
         canvas.height - 21 * UIRatio,
         20 * UIRatio,
         20 * UIRatio,
       );
     }
+
+    if (this.inventory.teleport) {
+      if (this.teleportPlaced) {
+        c.drawImage(
+          clockPlacedInvImg,
+          canvas.width - 102 * UIRatio,
+          canvas.height - 21 * UIRatio,
+          20 * UIRatio,
+          20 * UIRatio,
+        );
+      } else {
+        c.drawImage(
+          clockInvImg,
+          canvas.width - 102 * UIRatio,
+          canvas.height - 21 * UIRatio,
+          20 * UIRatio,
+          20 * UIRatio,
+        );
+      }
+    }
     c.globalAlpha = 0.75;
     c.fillStyle = "black";
-    if (this.dashCount > 0) {
+    if (this.dashCount > 0 && this.inventory.dash) {
       c.fillRect(
-        canvas.width - 74 * UIRatio,
-        canvas.height - 22 * UIRatio,
+        canvas.width - 82 * UIRatio,
+        canvas.height - 22 * UIRatio + 20 * UIRatio * (this.dashCount / 50),
         20 * UIRatio,
-        20 * UIRatio,
+        20 * UIRatio - UIRatio * (this.dashCount / 50) * 20,
       );
     }
 
@@ -1004,19 +1024,26 @@ export class Player {
     }
 
     if (this.inventory.sword) {
-      c.fillText("2", 27 * UIRatio, canvas.height - 5 * UIRatio);
+      c.fillText("2", 25 * UIRatio, canvas.height - 5 * UIRatio);
     }
 
     if (this.inventory.gun) {
-      c.fillText("3", 49 * UIRatio, canvas.height - 5 * UIRatio);
+      c.fillText("3", 45 * UIRatio, canvas.height - 5 * UIRatio);
     }
 
     if (this.inventory.sheild) {
-      c.fillText("4", 71 * UIRatio, canvas.height - 5 * UIRatio);
+      c.fillText("4", 65 * UIRatio, canvas.height - 5 * UIRatio);
     }
 
     if (this.inventory.horn) {
-      c.fillText("5", canvas.width - 93 * UIRatio, canvas.height - 5 * UIRatio);
+      c.fillText("5", 85 * UIRatio, canvas.height - 5 * UIRatio);
+    }
+
+    if (this.inventory.dash) {
+      c.fillText("E", canvas.width - 79 * UIRatio, canvas.height - 5 * UIRatio);
+    }
+    if (this.inventory.teleport) {
+      c.fillText("Q", canvas.width - 99 * UIRatio, canvas.height - 5 * UIRatio);
     }
 
     c.globalAlpha = 1;
@@ -1034,7 +1061,7 @@ export class Player {
     }
     if (this.holding === 2 && this.inventory.sword) {
       c.rect(
-        24 * UIRatio,
+        22 * UIRatio,
         canvas.height - 22 * UIRatio,
         20 * UIRatio,
         20 * UIRatio,
@@ -1043,7 +1070,7 @@ export class Player {
     }
     if (this.holding === 3 && this.inventory.gun) {
       c.rect(
-        46 * UIRatio,
+        42 * UIRatio,
         canvas.height - 22 * UIRatio,
         20 * UIRatio,
         20 * UIRatio,
@@ -1052,7 +1079,7 @@ export class Player {
     }
     if (this.holding === 4 && this.inventory.sheild) {
       c.rect(
-        68 * UIRatio,
+        62 * UIRatio,
         canvas.height - 22 * UIRatio,
         20 * UIRatio,
         20 * UIRatio,
@@ -1061,7 +1088,7 @@ export class Player {
     }
     if (this.holding === 5 && this.inventory.horn) {
       c.rect(
-        canvas.width - 96 * UIRatio,
+        82 * UIRatio,
         canvas.height - 22 * UIRatio,
         20 * UIRatio,
         20 * UIRatio,
@@ -1070,7 +1097,7 @@ export class Player {
     }
     if (this.dashCount === 0 && this.inventory.dash) {
       c.rect(
-        canvas.width - 74 * UIRatio,
+        canvas.width - 82 * UIRatio,
         canvas.height - 22 * UIRatio,
         20 * UIRatio,
         20 * UIRatio,
@@ -1099,22 +1126,6 @@ export class Player {
     } else {
       c.fillStyle = "#b33939";
     }
-
-    if (this.inventory.run) {
-      c.fillRect(
-        canvas.width - 52 * UIRatio + ((1000 - this.battery) / 20) * UIRatio,
-        canvas.height - 21 * UIRatio,
-        (this.battery / 20) * UIRatio,
-        5 * UIRatio,
-      );
-    } else {
-      c.fillRect(
-        canvas.width - 52 * UIRatio + ((1000 - this.battery) / 20) * UIRatio,
-        canvas.height - 14 * UIRatio,
-        (this.battery / 20) * UIRatio,
-        5 * UIRatio,
-      );
-    }
   }
 
   private drawStaminaUi() {
@@ -1125,9 +1136,9 @@ export class Player {
     }
 
     c.fillRect(
-      canvas.width - 52 * UIRatio + ((1000 - this.stamina) / 20) * UIRatio,
+      canvas.width - (this.stamina / 1000) * 58 * UIRatio - 2 * UIRatio,
       canvas.height - 14 * UIRatio,
-      (this.stamina / 20) * UIRatio,
+      (this.stamina / 1000) * 58 * UIRatio,
       5 * UIRatio,
     );
   }
@@ -1135,9 +1146,9 @@ export class Player {
   private drawHealthUi() {
     c.fillStyle = "#e74c3c";
     c.fillRect(
-      canvas.width - 52 * UIRatio + ((1000 - this.health) / 20) * UIRatio,
+      canvas.width - (this.health / 1000) * 58 * UIRatio - 2 * UIRatio,
       canvas.height - 7 * UIRatio,
-      (this.health / 20) * UIRatio,
+      (this.health / 1000) * 58 * UIRatio,
       5 * UIRatio,
     );
   }
@@ -1205,12 +1216,33 @@ export class Player {
     c.globalAlpha = 1;
   }
 
+  private drawFireballHitUi() {
+    if (this.fireballHit > 0) {
+      c.globalAlpha = 0.5;
+      c.fillStyle = "#e67e22";
+
+      c.fillRect(0, 0, canvas.width, canvas.height);
+
+      c.globalAlpha = 1;
+    }
+  }
+  private drawHitUi() {
+    if (this.hit > 0) {
+      c.globalAlpha = 0.5;
+      c.fillStyle = "#e67e22";
+      c.fillRect(0, 0, canvas.width, canvas.height);
+      c.globalAlpha = 1;
+    }
+  }
+
   drawUi(map: number[][]) {
     this.drawHoldingEffectUi();
     if (!this.running) this.drawFlashBeamUi();
 
     if (this.inventory.run) this.drawRunUi();
     this.drawInBlockUi(map);
+    this.drawFireballHitUi();
+    this.drawHitUi();
 
     if (this.inventory.gun) this.drawAmmoUi();
     if (this.inventory.gun && this.holding === 3) this.drawShootingUi();
@@ -1278,9 +1310,10 @@ export class Player {
     }
 
     if (
-      keyMap.get("ShiftLeft") &&
       this.dashCount === 0 &&
-      keyMap.get("Space") &&
+      this.stamina > 15 &&
+      !this.tired &&
+      keyMap.get("KeyE") &&
       (keyMap.get("ArrowUp") ||
         keyMap.get("ArrowDown") ||
         keyMap.get("KeyW") ||
@@ -1392,7 +1425,7 @@ export class Player {
   }
 
   private gunUpdate() {
-    if (this.ammoCounter === 500) {
+    if (this.ammoCounter === 100) {
       if (this.ammo < 10) {
         ammoSound.play();
         this.ammo += 1;
@@ -1458,7 +1491,7 @@ export class Player {
     const blockY = Math.floor(this.posX);
 
     if (map[blockY][blockX] === 7) {
-      this.health -= 5;
+      this.takeDamage(10);
     }
   }
 
@@ -1560,9 +1593,13 @@ export class Player {
       this.dashCount = 0;
     }
 
-    if (this.dashCount > 0 && this.dashCount < 5 && this.stamina > 15) {
+    if (
+      this.dashCount > 0 &&
+      this.dashCount < 5 &&
+      this.stamina > 15 &&
+      !this.tired
+    ) {
       this.stamina -= 15;
-      this.useCounter = 0;
       this.swordHit = false;
 
       for (let i = 0; i < 10; i++) {
@@ -1619,8 +1656,84 @@ export class Player {
   }
 
   private sheildUpdate() {
-    if (this.sheild && !keyMap.get("Space")) {
+    if ((this.sheild && !keyMap.get("Space")) || this.tired) {
       this.sheild = false;
+    }
+    if (this.sheild) {
+      if (this.health < 1000) {
+        this.health++;
+      }
+      if (this.stamina > 0) {
+        this.stamina -= 5;
+      }
+    }
+  }
+
+  private fireballCollisonUpdate(sprites: sprite[]) {
+    for (let i = 0; i < sprites.length; i++) {
+      if (sprites[i].type instanceof Fireball) {
+        const fireball = sprites[i].type;
+        const distance = Math.sqrt(
+          (this.posX - fireball.x) * (this.posX - fireball.x) +
+            (this.posY - fireball.y) * (this.posY - fireball.y),
+        );
+        if (distance < this.radius / 2) {
+          this.fireballHit = 5;
+          fireball.alive = false;
+          hitSound.play();
+          this.takeDamage(200);
+        }
+      }
+    }
+  }
+
+  private hitUpdate() {
+    if (this.hit > 0) {
+      this.hit--;
+    }
+
+    if (this.fireballHit > 0) {
+      this.fireballHit--;
+    }
+  }
+
+  private takeDamage(damage: number) {
+    let sheild = 1;
+    if (this.sheild) {
+      sheild = 0.5;
+    }
+    this.health -= damage * sheild;
+    if (this.health < 0) {
+      this.health = 0;
+    }
+  }
+
+  private teleportUpdate(ls: levelSettings) {
+    if (!this.teleportPlaced && keyMap.get("KeyQ")) {
+      this.teleportX = this.posX;
+      this.teleportY = this.posY;
+      this.teleportPlaced = true;
+      keyMap.set("KeyQ", false);
+      const teleport = new Teleport();
+      const sprite = {
+        x: this.teleportX,
+        y: this.teleportY,
+        texture: 2,
+        type: teleport,
+      };
+      ls.sprites.push(sprite);
+    }
+    if (this.teleportPlaced && keyMap.get("KeyQ")) {
+      this.posX = this.teleportX;
+      this.posY = this.teleportY;
+      this.teleportPlaced = false;
+      keyMap.set("KeyQ", false);
+      for (let i = ls.sprites.length - 1; i > -1; i--) {
+        if (ls.sprites[i].type instanceof Teleport) {
+          ls.sprites[i].type.alive = false;
+          break;
+        }
+      }
     }
   }
 
@@ -1628,7 +1741,6 @@ export class Player {
     this.useUpdate();
 
     //seperate gun and sword update
-    // if (this.inventory.gun) this.gunUpdate();
     this.gunUpdate();
     if (this.inventory.flashlight) this.flashlightUpdate();
     if (this.inventory.flashlight) this.hiddenBlockUpdate(ls.map);
@@ -1637,6 +1749,10 @@ export class Player {
     if (this.inventory.run) this.staminaUpdate();
     if (this.inventory.dash) this.dashUpdate(ls.map.map);
     if (this.inventory.sheild) this.sheildUpdate();
+    if (this.inventory.teleport) this.teleportUpdate(ls);
+
+    this.fireballCollisonUpdate(ls.sprites);
+    this.hitUpdate();
 
     this.moveUpdate(ls.map.map);
     this.holdingUpdate();

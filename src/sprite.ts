@@ -1,5 +1,7 @@
 import { Fireball } from "./fireball";
 import { levelSettings } from "./levels";
+import { Teleport } from "./player";
+import { Mage } from "./enemy";
 interface sprite {
   x: number;
   y: number;
@@ -28,11 +30,26 @@ function sortSprites(spriteDistance: spriteOrder[]) {
 
 function spriteUpdate(ls: levelSettings) {
   for (let i = ls.sprites.length - 1; i > -1; i--) {
+    const sprite = ls.sprites[i];
     if (ls.sprites[i].type instanceof Fireball) {
-      const sprite = ls.sprites[i];
       sprite.type.update(ls.map.map);
       sprite.x = sprite.type.x;
       sprite.y = sprite.type.y;
+      if (!sprite.type.alive) {
+        ls.sprites.splice(i, 1);
+      }
+    } else if (ls.sprites[i].type instanceof Teleport) {
+      if (!sprite.type.alive) {
+        ls.sprites.splice(i, 1);
+      }
+    } else if (ls.sprites[i].type instanceof Mage) {
+      sprite.type.update(ls);
+      if (sprite.type.shootCount > sprite.type.shootTimer - 15) {
+        sprite.texture = 4;
+      } else {
+        sprite.texture = 3;
+      }
+
       if (!sprite.type.alive) {
         ls.sprites.splice(i, 1);
       }

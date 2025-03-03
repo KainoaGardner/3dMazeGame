@@ -12,7 +12,7 @@ const wallTextures = new Array(12)
 
 const bgTextures = new Array(5).fill(null).map(() => Array(texWidth).fill(0));
 
-const spriteTextures = new Array(2)
+const spriteTextures = new Array(6)
   .fill(null)
   .map(() => Array(spriteTexWidth).fill(0));
 
@@ -171,6 +171,40 @@ if (closeWallTex instanceof HTMLElement) {
   });
 }
 
+const break0TexList = new Array(texWidth)
+  .fill(null)
+  .map(() => Array(3).fill(0));
+const break0Tex = new Image();
+if (break0Tex instanceof HTMLElement) {
+  break0Tex.src = "/img/walls/break0.png";
+  break0Tex.addEventListener("load", function () {
+    getTexture(break0Tex, break0TexList, 9, texWidth, texHeight, wallTextures);
+  });
+}
+
+const break1TexList = new Array(texWidth)
+  .fill(null)
+  .map(() => Array(3).fill(0));
+const break1Tex = new Image();
+if (break1Tex instanceof HTMLElement) {
+  break1Tex.src = "/img/walls/break1.png";
+  break1Tex.addEventListener("load", function () {
+    getTexture(break1Tex, break1TexList, 10, texWidth, texHeight, wallTextures);
+  });
+}
+
+const break2TexList = new Array(texWidth)
+  .fill(null)
+  .map(() => Array(3).fill(0));
+const break2Tex = new Image();
+if (break2Tex instanceof HTMLElement) {
+  break2Tex.src = "/img/walls/break2.png";
+  break2Tex.addEventListener("load", function () {
+    getTexture(break2Tex, break2TexList, 11, texWidth, texHeight, wallTextures);
+  });
+}
+
+//sprites
 const fireBallTexList = new Array(spriteTexWidth)
   .fill(null)
   .map(() => Array(3).fill(0));
@@ -207,40 +241,77 @@ if (fireBallReflectTex instanceof HTMLElement) {
   });
 }
 
-const break0TexList = new Array(texWidth)
+const clockTexList = new Array(spriteTexWidth)
   .fill(null)
   .map(() => Array(3).fill(0));
-const break0Tex = new Image();
-if (break0Tex instanceof HTMLElement) {
-  break0Tex.src = "/img/walls/break0.png";
-  break0Tex.addEventListener("load", function () {
-    getTexture(break0Tex, break0TexList, 9, texWidth, texHeight, wallTextures);
+const clockTex = new Image();
+if (clockTex instanceof HTMLElement) {
+  clockTex.src = "/img/sprites/clock.png";
+  clockTex.addEventListener("load", function () {
+    getTexture(
+      clockTex,
+      clockTexList,
+      2,
+      spriteTexWidth,
+      spriteTexHeight,
+      spriteTextures,
+    );
   });
 }
 
-const break1TexList = new Array(texWidth)
+const mage0TexList = new Array(spriteTexWidth)
   .fill(null)
   .map(() => Array(3).fill(0));
-const break1Tex = new Image();
-if (break1Tex instanceof HTMLElement) {
-  break1Tex.src = "/img/walls/break1.png";
-  break1Tex.addEventListener("load", function () {
-    getTexture(break1Tex, break1TexList, 10, texWidth, texHeight, wallTextures);
+const mage0Tex = new Image();
+if (mage0Tex instanceof HTMLElement) {
+  mage0Tex.src = "/img/sprites/mage0.png";
+  mage0Tex.addEventListener("load", function () {
+    getTexture(
+      mage0Tex,
+      mage0TexList,
+      3,
+      spriteTexWidth,
+      spriteTexHeight,
+      spriteTextures,
+    );
   });
 }
 
-const break2TexList = new Array(texWidth)
+const mage1TexList = new Array(spriteTexWidth)
   .fill(null)
   .map(() => Array(3).fill(0));
-const break2Tex = new Image();
-if (break2Tex instanceof HTMLElement) {
-  break2Tex.src = "/img/walls/break2.png";
-  break2Tex.addEventListener("load", function () {
-    getTexture(break2Tex, break2TexList, 11, texWidth, texHeight, wallTextures);
+const mage1Tex = new Image();
+if (mage1Tex instanceof HTMLElement) {
+  mage1Tex.src = "/img/sprites/mage1.png";
+  mage1Tex.addEventListener("load", function () {
+    getTexture(
+      mage1Tex,
+      mage1TexList,
+      4,
+      spriteTexWidth,
+      spriteTexHeight,
+      spriteTextures,
+    );
   });
 }
 
-//sprites
+const boss0TexList = new Array(spriteTexWidth)
+  .fill(null)
+  .map(() => Array(3).fill(0));
+const boss0Tex = new Image();
+if (boss0Tex instanceof HTMLElement) {
+  boss0Tex.src = "/img/sprites/boss1.png";
+  boss0Tex.addEventListener("load", function () {
+    getTexture(
+      boss0Tex,
+      boss0TexList,
+      5,
+      spriteTexWidth,
+      spriteTexHeight,
+      spriteTextures,
+    );
+  });
+}
 
 //items
 const flashlightImg = new Image();
@@ -269,6 +340,14 @@ if (hornImg instanceof HTMLElement) hornImg.src = "/img/items/horn.png";
 
 const hornOnImg = new Image();
 if (hornOnImg instanceof HTMLElement) hornOnImg.src = "/img/items/hornon.png";
+
+const clockInvImg = new Image();
+if (clockInvImg instanceof HTMLElement)
+  clockInvImg.src = "/img/items/clock-inv0.png";
+
+const clockPlacedInvImg = new Image();
+if (clockPlacedInvImg instanceof HTMLElement)
+  clockPlacedInvImg.src = "/img/items/clock-inv1.png";
 
 // const sword0Img = new Image();
 // if (sword0Img instanceof HTMLElement) sword0Img.src = "/img/items/sword0.png";
@@ -334,6 +413,8 @@ export {
   gunInvImg,
   dashInvImg,
   flashLightInvImg,
+  clockInvImg,
+  clockPlacedInvImg,
   flashlightoffImg,
   shootImgs,
   ammoImg,

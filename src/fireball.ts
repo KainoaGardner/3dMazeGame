@@ -1,5 +1,4 @@
 import { levelSettings } from "./levels";
-import { sprite } from "./sprite";
 export class Fireball {
   x: number;
   y: number;

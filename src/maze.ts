@@ -8,7 +8,7 @@ interface cell {
 export function makeMap(
   size: number,
   removeAmount: number,
-  torchAmount: number,
+  blockAmount: number,
 ) {
   const maze: cell[][] = [];
 
@@ -24,7 +24,7 @@ export function makeMap(
   const visited = new Set<string>();
   makeBaseMaze(0, 0, maze, visited);
 
-  return makeFinalMaze(maze, removeAmount, torchAmount);
+  return makeFinalMaze(maze, removeAmount, blockAmount);
 }
 
 function makeBaseMaze(
@@ -84,7 +84,7 @@ function makeBaseMaze(
 function makeFinalMaze(
   baseMaze: cell[][],
   removeAmount: number,
-  torchAmount: number,
+  blockAmount: number,
 ): number[][] {
   const size = baseMaze.length;
   let finalMaze: number[][] = [];
@@ -140,8 +140,8 @@ function makeFinalMaze(
   if (removeAmount !== 0) {
     finalMaze = removeWalls(finalMaze, size * 2 + 1, removeAmount);
   }
-  if (torchAmount !== 0) {
-    finalMaze = addTorches(finalMaze, size * 2 + 1, torchAmount);
+  if (blockAmount !== 0) {
+    finalMaze = addBlocks(finalMaze, size * 2 + 1, blockAmount);
   }
   return finalMaze;
 }
@@ -169,14 +169,15 @@ function removeWalls(
   return maze;
 }
 
-function addTorches(
-  maze: number[][],
-  size: number,
-  chance: number,
-): number[][] {
+function addBlocks(maze: number[][], size: number, chance: number): number[][] {
   for (let r = 0; r < size; r++) {
     for (let c = 0; c < size; c++) {
-      if (maze[r][c] === 0 && Math.floor(Math.random() * chance) === 0) {
+      if (
+        maze[r][c] === 0 &&
+        Math.floor(Math.random() * chance) === 0 &&
+        r != 1 &&
+        c != 1
+      ) {
         maze[r][c] = 3;
       }
     }

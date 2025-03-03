@@ -8,6 +8,9 @@ keyMap.set("KeyS", false);
 keyMap.set("KeyD", false);
 keyMap.set("KeyA", false);
 
+keyMap.set("KeyE", false);
+keyMap.set("KeyQ", false);
+
 keyMap.set("Space", false);
 keyMap.set("ShiftLeft", false);
 keyMap.set("Digit1", false);

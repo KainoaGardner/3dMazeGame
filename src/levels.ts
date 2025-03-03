@@ -4,6 +4,7 @@ import { makeMap } from "./maze";
 import { sprite } from "./sprite";
 import { CloseBlock } from "./closeblock";
 import { FireballWall } from "./fireball";
+import { Mage } from "./enemy";
 // import { pos } from "./global";
 
 interface levelSettings {
@@ -53,6 +54,7 @@ function level1(ls: levelSettings) {
     sword: false,
     sheild: false,
     dash: false,
+    teleport: false,
   };
 
   //map
@@ -63,15 +65,15 @@ function level1(ls: levelSettings) {
       1, 1, 1, 1, 1, 1, 1,
     ],
     [
-      1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 6, 6, 0, 0, 0, 6, 0, 0, 0,
+      1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 6, 6, 0, 0, 0, 6, 0, 0, 0,
       1, 6, 0, 0, 0, 4, 1,
     ],
     [
-      1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0,
+      1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0,
       1, 6, 0, 0, 1, 0, 5,
     ],
     [
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0,
+      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 2, 2,
       1, 6, 0, 0, 1, 0, 5,
     ],
     [
@@ -87,19 +89,19 @@ function level1(ls: levelSettings) {
       0, 0, 0, 1, 0, 0, 1,
     ],
     [
-      1, 0, 0, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 1, 1, 6, 0, 0, 0, 1, 0, 1, 0, 6,
+      1, 0, 0, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 1, 1, 6, 0, 2, 0, 1, 0, 1, 0, 6,
       0, 0, 6, 1, 0, 0, 1,
     ],
     [
-      1, 0, 0, 0, 1, 1, 6, 6, 1, 1, 6, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-      1, 1, 1, 1, 0, 5, 1,
+      1, 0, 0, 1, 1, 1, 6, 6, 1, 1, 6, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1,
+      1, 1, 1, 1, 2, 5, 1,
     ],
     [
-      1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 1, 1, 1, 0, 0, 1, 5, 0,
+      1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 1, 1, 1, 0, 0, 1, 5, 0,
       0, 0, 0, 0, 0, 0, 1,
     ],
     [
-      1, 0, 0, 1, 6, 6, 1, 1, 6, 6, 1, 1, 6, 6, 1, 0, 0, 0, 0, 0, 0, 6, 1, 1, 0,
+      1, 2, 2, 1, 6, 6, 1, 1, 6, 6, 1, 1, 6, 6, 1, 2, 2, 0, 0, 0, 0, 6, 1, 1, 0,
       1, 0, 1, 1, 1, 0, 1,
     ],
     [
@@ -108,10 +110,10 @@ function level1(ls: levelSettings) {
     ],
     [
       1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
-      1, 1, 1, 0, 0, 0, 1,
+      1, 1, 1, 2, 0, 0, 1,
     ],
     [
-      1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0,
+      1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 2, 0,
       1, 0, 0, 0, 1, 1, 1,
     ],
     [
@@ -119,7 +121,7 @@ function level1(ls: levelSettings) {
       0, 0, 0, 0, 0, 0, 5,
     ],
     [
-      1, 5, 1, 1, 5, 5, 5, 5, 5, 1, 5, 5, 5, 5, 5, 1, 1, 1, 1, 5, 1, 1, 1, 1, 5,
+      1, 5, 5, 1, 5, 5, 5, 5, 5, 1, 5, 5, 5, 5, 5, 1, 1, 1, 1, 5, 1, 1, 1, 1, 5,
       1, 1, 1, 1, 1, 1, 1,
     ],
   ];
@@ -189,6 +191,7 @@ function level1(ls: levelSettings) {
     new FireballWall(2.5, 15.5, 0, -0.1, 100, 50),
 
     new FireballWall(15.5, 1.5, -0.1, 0, 100),
+    new FireballWall(15.5, 2.5, -0.1, 0, 100, 50),
 
     new FireballWall(15.5, 4.5, -0.1, 0, 100, 100),
     new FireballWall(15.5, 5.5, -0.1, 0, 100, 80),
@@ -222,7 +225,7 @@ function level1(ls: levelSettings) {
   ls.map.brightness = 0.2;
   ls.floorTex = 0;
   ls.ceilingTex = 1;
-  // ls.sprites = [{ x: 1.5, y: 10, texture: 6 }];
+  ls.sprites = [];
 }
 function level2(ls: levelSettings) {
   //player
@@ -242,6 +245,8 @@ function level2(ls: levelSettings) {
     sword: true,
     sheild: false,
     dash: false,
+
+    teleport: false,
   };
 
   //map
@@ -312,15 +317,16 @@ function level4(ls: levelSettings) {
     sword: true,
     sheild: false,
     dash: false,
+    teleport: false,
   };
 
   //map
 
-  ls.map.map = makeMap(16, 5, 0);
+  ls.map.map = makeMap(16, 5, 15);
 
   const goal = ls.map.map.length - 1;
   ls.map.lightList = [{ x: goal, y: goal }];
-  ls.map.brightness = 0.1;
+  ls.map.brightness = 0.2;
 
   ls.moveWall = [];
   ls.fireWall = [];
@@ -353,6 +359,7 @@ function level0(ls: levelSettings) {
     sword: true,
     sheild: true,
     dash: true,
+    teleport: true,
   };
 
   //map
@@ -376,7 +383,9 @@ function level0(ls: levelSettings) {
   ls.floorTex = 3;
   ls.ceilingTex = 1;
 
-  ls.sprites = [];
+  ls.sprites = [
+    { x: 3, y: 3, texture: 3, type: new Mage(3, 3, 100, 0.1, 100) },
+  ];
 }
 
 export { type levelSettings, setLevel };
