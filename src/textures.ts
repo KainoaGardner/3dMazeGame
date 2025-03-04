@@ -12,7 +12,7 @@ const wallTextures = new Array(12)
 
 const bgTextures = new Array(5).fill(null).map(() => Array(texWidth).fill(0));
 
-const spriteTextures = new Array(6)
+const spriteTextures = new Array(8)
   .fill(null)
   .map(() => Array(spriteTexWidth).fill(0));
 
@@ -295,16 +295,16 @@ if (mage1Tex instanceof HTMLElement) {
   });
 }
 
-const boss0TexList = new Array(spriteTexWidth)
+const slime0TexList = new Array(spriteTexWidth)
   .fill(null)
   .map(() => Array(3).fill(0));
-const boss0Tex = new Image();
-if (boss0Tex instanceof HTMLElement) {
-  boss0Tex.src = "/img/sprites/boss1.png";
-  boss0Tex.addEventListener("load", function () {
+const slime0Tex = new Image();
+if (slime0Tex instanceof HTMLElement) {
+  slime0Tex.src = "/img/sprites/slime0.png";
+  slime0Tex.addEventListener("load", function () {
     getTexture(
-      boss0Tex,
-      boss0TexList,
+      slime0Tex,
+      slime0TexList,
       5,
       spriteTexWidth,
       spriteTexHeight,
@@ -312,6 +312,59 @@ if (boss0Tex instanceof HTMLElement) {
     );
   });
 }
+const slime1TexList = new Array(spriteTexWidth)
+  .fill(null)
+  .map(() => Array(3).fill(0));
+const slime1Tex = new Image();
+if (slime1Tex instanceof HTMLElement) {
+  slime1Tex.src = "/img/sprites/slime1.png";
+  slime1Tex.addEventListener("load", function () {
+    getTexture(
+      slime1Tex,
+      slime1TexList,
+      6,
+      spriteTexWidth,
+      spriteTexHeight,
+      spriteTextures,
+    );
+  });
+}
+
+const slime2TexList = new Array(spriteTexWidth)
+  .fill(null)
+  .map(() => Array(3).fill(0));
+const slime2Tex = new Image();
+if (slime2Tex instanceof HTMLElement) {
+  slime2Tex.src = "/img/sprites/slime2.png";
+  slime2Tex.addEventListener("load", function () {
+    getTexture(
+      slime2Tex,
+      slime2TexList,
+      7,
+      spriteTexWidth,
+      spriteTexHeight,
+      spriteTextures,
+    );
+  });
+}
+
+// const boss0TexList = new Array(spriteTexWidth)
+//   .fill(null)
+//   .map(() => Array(3).fill(0));
+// const boss0Tex = new Image();
+// if (boss0Tex instanceof HTMLElement) {
+//   boss0Tex.src = "/img/sprites/boss1.png";
+//   boss0Tex.addEventListener("load", function () {
+//     getTexture(
+//       boss0Tex,
+//       boss0TexList,
+//       5,
+//       spriteTexWidth,
+//       spriteTexHeight,
+//       spriteTextures,
+//     );
+//   });
+// }
 
 //items
 const flashlightImg = new Image();
@@ -322,6 +375,10 @@ if (flashlightoffImg instanceof HTMLElement)
   flashlightoffImg.src = "/img/items/flashlightoff.png";
 const gunImg = new Image();
 if (gunImg instanceof HTMLElement) gunImg.src = "/img/items/gun.png";
+
+const gunShootImg = new Image();
+if (gunShootImg instanceof HTMLElement)
+  gunShootImg.src = "/img/items/gunshoot.png";
 
 const swordImgs: any[] = [];
 for (let i = 0; i < 4; i++) {
@@ -393,6 +450,9 @@ for (let i = 0; i < 2; i++) {
 const ammoImg = new Image();
 if (ammoImg instanceof HTMLElement) ammoImg.src = "/img/items/ammo.png";
 
+const errorImg = new Image();
+if (errorImg instanceof HTMLElement) errorImg.src = "/img/items/error.png";
+
 export {
   texWidth,
   texHeight,
@@ -402,6 +462,7 @@ export {
   wallTextures,
   spriteTextures,
   gunImg,
+  gunShootImg,
   swordImgs,
   swordInvImg,
   sheildImg,
@@ -418,4 +479,5 @@ export {
   flashlightoffImg,
   shootImgs,
   ammoImg,
+  errorImg,
 };

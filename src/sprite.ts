@@ -1,7 +1,7 @@
 import { Fireball } from "./fireball";
 import { levelSettings } from "./levels";
 import { Teleport } from "./player";
-import { Mage } from "./enemy";
+import { Slime, Mage } from "./enemy";
 interface sprite {
   x: number;
   y: number;
@@ -33,8 +33,10 @@ function spriteUpdate(ls: levelSettings) {
     const sprite = ls.sprites[i];
     if (ls.sprites[i].type instanceof Fireball) {
       sprite.type.update(ls.map.map);
+      sprite.type.reflectDamage(ls.sprites);
       sprite.x = sprite.type.x;
       sprite.y = sprite.type.y;
+
       if (!sprite.type.alive) {
         ls.sprites.splice(i, 1);
       }
@@ -50,6 +52,19 @@ function spriteUpdate(ls: levelSettings) {
         sprite.texture = 3;
       }
 
+      if (!sprite.type.alive) {
+        ls.sprites.splice(i, 1);
+      }
+    } else if (ls.sprites[i].type instanceof Slime) {
+      sprite.type.walkCounterUpdate();
+      sprite.type.hurtUpdate();
+      if (sprite.type.hurtCounter > 0) {
+        sprite.texture = 7;
+      } else if (sprite.type.walkCounter > 15) {
+        sprite.texture = 6;
+      } else {
+        sprite.texture = 5;
+      }
       if (!sprite.type.alive) {
         ls.sprites.splice(i, 1);
       }

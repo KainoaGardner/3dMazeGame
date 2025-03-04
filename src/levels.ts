@@ -4,8 +4,30 @@ import { makeMap } from "./maze";
 import { sprite } from "./sprite";
 import { CloseBlock } from "./closeblock";
 import { FireballWall } from "./fireball";
-import { Mage } from "./enemy";
+import { Slime, Mage } from "./enemy";
 // import { pos } from "./global";
+
+interface direction {
+  dirX: number;
+  dirY: number;
+  planeX: number;
+  planeY: number;
+}
+function getPlayerDirection(angle: number): direction {
+  angle = (angle * Math.PI) / 180;
+  let dirX = 1;
+  let dirY = 0;
+  let planeX = 0;
+  let planeY = -1;
+
+  dirX = Math.cos(-angle);
+  dirY = Math.sin(-angle);
+
+  planeX = Math.sin(-angle);
+  planeY = -Math.cos(-angle);
+
+  return { dirX: dirX, dirY: dirY, planeX: planeX, planeY: planeY };
+}
 
 interface levelSettings {
   level: number;
@@ -38,12 +60,13 @@ function setLevel(ls: levelSettings) {
 
 function level1(ls: levelSettings) {
   //player
+  const direction = getPlayerDirection(-90);
   ls.player.posX = 1.5;
   ls.player.posY = 1.5;
-  ls.player.dirX = 1;
-  ls.player.dirY = 0;
-  ls.player.planeX = 0;
-  ls.player.planeY = -1;
+  ls.player.dirX = direction.dirX;
+  ls.player.dirY = direction.dirY;
+  ls.player.planeX = direction.planeX;
+  ls.player.planeY = direction.planeY;
   ls.player.holding = 1;
 
   ls.player.inventory = {
@@ -297,7 +320,7 @@ function level2(ls: levelSettings) {
   ls.floorTex = 4;
   ls.ceilingTex = 1;
 
-  ls.sprites = [];
+  ls.sprites = [{ x: 4.5, y: 6.5, texture: 5, type: new Slime(4.5, 6.5, 50) }];
 }
 function level3(ls: levelSettings) {}
 function level4(ls: levelSettings) {
@@ -385,6 +408,7 @@ function level0(ls: levelSettings) {
 
   ls.sprites = [
     { x: 3, y: 3, texture: 3, type: new Mage(3, 3, 100, 0.1, 100) },
+    { x: 5, y: 3, texture: 5, type: new Slime(5, 3, 50) },
   ];
 }
 

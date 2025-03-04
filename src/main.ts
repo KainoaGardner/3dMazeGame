@@ -10,7 +10,16 @@ document.body.style.overflow = "hidden";
 
 const ls = {
   level: 0,
-  player: new Player(0, 0, 1, 0.04, 0.05),
+  player: new Player(0, 0, 1, 0.04, 0.05, {
+    flashlight: false,
+    gun: false,
+    run: false,
+    horn: false,
+    sword: false,
+    sheild: false,
+    dash: false,
+    teleport: false,
+  }),
   map: new Map([], 100, canvas.height, 1),
   sprites: new Array<sprite>(),
   moveWall: new Array<CloseBlock>(),

@@ -1,4 +1,6 @@
 import { levelSettings } from "./levels";
+import { sprite } from "./sprite";
+import { Slime, Mage } from "./enemy";
 export class Fireball {
   x: number;
   y: number;
@@ -29,6 +31,25 @@ export class Fireball {
       this.y += this.velY;
     } else {
       this.alive = false;
+    }
+  }
+
+  reflectDamage(sprites: sprite[]) {
+    if (this.reflect) {
+      for (let i = 0; i < sprites.length; i++) {
+        const sprite = sprites[i];
+        if (sprite.type instanceof Mage || sprite.type instanceof Slime) {
+          const distance = Math.sqrt(
+            (this.x - sprite.x) * (this.x - sprite.x) +
+              (this.y - sprite.y) * (this.y - sprite.y),
+          );
+          if (distance < 1) {
+            sprite.type.takeDamage(50);
+            this.alive = false;
+            break;
+          }
+        }
+      }
     }
   }
 }

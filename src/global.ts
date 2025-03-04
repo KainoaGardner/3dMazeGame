@@ -54,6 +54,7 @@ const buffer = new Array(bufferHeight)
   .map(() => Array(bufferWidth).fill(undefined));
 
 const lightingBuffer = new Array(bufferWidth).fill(undefined);
+const invisBlockBuffer = new Array(bufferWidth).fill(undefined);
 const zBuffer = new Array(bufferWidth).fill(undefined);
 
 export {
@@ -61,6 +62,7 @@ export {
   c,
   buffer,
   lightingBuffer,
+  invisBlockBuffer,
   bufferWidth,
   bufferHeight,
   bufferRatio,
