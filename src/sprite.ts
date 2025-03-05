@@ -2,6 +2,7 @@ import { Fireball } from "./fireball";
 import { levelSettings } from "./levels";
 import { Teleport } from "./player";
 import { Slime, Mage } from "./enemy";
+import { pos } from "./global";
 interface sprite {
   x: number;
   y: number;
@@ -45,9 +46,20 @@ function spriteUpdate(ls: levelSettings) {
         ls.sprites.splice(i, 1);
       }
     } else if (ls.sprites[i].type instanceof Mage) {
-      sprite.type.update(ls);
-      if (sprite.type.shootCount > sprite.type.shootTimer - 15) {
+      if (sprite.type.deadCounter === 0) {
+        sprite.type.update(ls);
+      }
+
+      sprite.type.hurtUpdate();
+
+      if (sprite.type.deadCounter > 0 && sprite.type.deadCounter < 10) {
+        sprite.texture = 6;
+      } else if (sprite.type.deadCounter > 9) {
+        sprite.texture = 7;
+      } else if (sprite.type.shootCount > sprite.type.shootTimer - 15) {
         sprite.texture = 4;
+      } else if (sprite.type.hurtCounter > 0) {
+        sprite.texture = 5;
       } else {
         sprite.texture = 3;
       }
@@ -56,14 +68,28 @@ function spriteUpdate(ls: levelSettings) {
         ls.sprites.splice(i, 1);
       }
     } else if (ls.sprites[i].type instanceof Slime) {
-      sprite.type.walkCounterUpdate();
+      if (sprite.type.deadCounter === 0) {
+        sprite.x = sprite.type.x;
+        sprite.y = sprite.type.y;
+
+        sprite.type.walkCounterUpdate();
+        sprite.type.moveUpdate(
+          { x: ls.player.posX, y: ls.player.posY },
+          ls.map.map,
+        );
+      }
+
       sprite.type.hurtUpdate();
-      if (sprite.type.hurtCounter > 0) {
-        sprite.texture = 7;
+      if (sprite.type.deadCounter > 0 && sprite.type.deadCounter < 10) {
+        sprite.texture = 11;
+      } else if (sprite.type.deadCounter > 9) {
+        sprite.texture = 12;
+      } else if (sprite.type.hurtCounter > 0) {
+        sprite.texture = 10;
       } else if (sprite.type.walkCounter > 15) {
-        sprite.texture = 6;
+        sprite.texture = 9;
       } else {
-        sprite.texture = 5;
+        sprite.texture = 8;
       }
       if (!sprite.type.alive) {
         ls.sprites.splice(i, 1);

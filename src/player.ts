@@ -1831,6 +1831,9 @@ export class Player {
         invDet * (-this.planeY * spriteX + this.planeX * spriteY);
 
       if (sprite instanceof Slime || sprite instanceof Mage) {
+        if (sprite.deadCounter !== 0) {
+          continue;
+        }
         if (
           this.holding === 2 &&
           this.swordCounter > 0 &&

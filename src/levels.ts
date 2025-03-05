@@ -48,6 +48,10 @@ function setLevel(ls: levelSettings) {
     case 2:
       level2(ls);
       break;
+    case 3:
+      level3(ls);
+      break;
+
     case 4:
       level4(ls);
       break;
@@ -284,7 +288,7 @@ function level2(ls: levelSettings) {
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 0, 0, 0, 1],
     [1, 5, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
     [5, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 1, 1, 1, 6, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 0, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 5],
     [1, 0, 0, 0, 1, 6, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
@@ -320,9 +324,71 @@ function level2(ls: levelSettings) {
   ls.floorTex = 4;
   ls.ceilingTex = 1;
 
-  ls.sprites = [{ x: 4.5, y: 6.5, texture: 5, type: new Slime(4.5, 6.5, 50) }];
+  ls.sprites = [
+    { x: 4.5, y: 6.5, texture: 5, type: new Slime(4.5, 6.5, 100, 2, 5) },
+
+    { x: 8.5, y: 13.5, texture: 5, type: new Slime(8.5, 13.5, 50, 2, 5) },
+    { x: 8, y: 11.5, texture: 5, type: new Slime(8, 11.5, 50, 2, 6) },
+    { x: 4.5, y: 13.5, texture: 5, type: new Slime(4.5, 13.5, 50, 2, 6) },
+
+    { x: 8, y: 2.5, texture: 5, type: new Slime(8, 2.5, 100, 3, 10) },
+    { x: 10, y: 3.5, texture: 5, type: new Slime(10, 3.5, 100, 2, 8) },
+    { x: 12, y: 3, texture: 5, type: new Slime(12, 3, 100, 2, 6) },
+    { x: 14, y: 2.5, texture: 5, type: new Slime(14, 2.5, 100, 2, 6) },
+    { x: 13.5, y: 4.5, texture: 5, type: new Slime(13.5, 4.5, 100, 2, 4) },
+  ];
 }
-function level3(ls: levelSettings) {}
+function level3(ls: levelSettings) {
+  //player
+  ls.player.posX = 1.5;
+  ls.player.posY = 1.5;
+  ls.player.dirX = 1;
+  ls.player.dirY = 0;
+  ls.player.planeX = 0;
+  ls.player.planeY = -1;
+
+  ls.player.inventory = {
+    flashlight: true,
+    gun: true,
+    run: true,
+    horn: false,
+    sword: true,
+    sheild: false,
+    dash: false,
+    teleport: false,
+  };
+
+  //map
+
+  ls.map.map = [
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+  ];
+
+  ls.map.lightList = [];
+  ls.map.brightness = 1;
+
+  ls.moveWall = [];
+  ls.fireWall = [];
+  ls.floorTex = 2;
+  ls.ceilingTex = 1;
+
+  ls.sprites = [{ x: 5, y: 6, texture: 5, type: new Slime(5, 6, 50, 1, 100) }];
+}
 function level4(ls: levelSettings) {
   //player
   ls.player.posX = 1.5;
@@ -407,8 +473,8 @@ function level0(ls: levelSettings) {
   ls.ceilingTex = 1;
 
   ls.sprites = [
-    { x: 3, y: 3, texture: 3, type: new Mage(3, 3, 100, 0.1, 100) },
-    { x: 5, y: 3, texture: 5, type: new Slime(5, 3, 50) },
+    // { x: 3, y: 3, texture: 3, type: new Mage(3, 3, 100, 0.1, 100) },
+    // { x: 5, y: 6, texture: 5, type: new Slime(5, 6, 2, 50, 10) },
   ];
 }
 

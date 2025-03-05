@@ -12,69 +12,10 @@ const wallTextures = new Array(12)
 
 const bgTextures = new Array(5).fill(null).map(() => Array(texWidth).fill(0));
 
-const spriteTextures = new Array(8)
+const spriteTextures = new Array(11)
   .fill(null)
   .map(() => Array(spriteTexWidth).fill(0));
 
-//bg
-const floorTexList = new Array(texWidth).fill(null).map(() => Array(3).fill(0));
-const floorTex = new Image();
-if (floorTex instanceof HTMLElement) {
-  floorTex.src = "/img/bg/roof.png";
-
-  floorTex.addEventListener("load", function () {
-    getTexture(floorTex, floorTexList, 0, texWidth, texHeight, bgTextures);
-  });
-}
-
-const roofTexList = new Array(texWidth).fill(null).map(() => Array(3).fill(0));
-const roofTex = new Image();
-if (roofTex instanceof HTMLElement) {
-  roofTex.src = "/img/bg/roof1.png";
-  roofTex.addEventListener("load", function () {
-    getTexture(roofTex, roofTexList, 1, texWidth, texHeight, bgTextures);
-  });
-}
-
-const tileTexList = new Array(texWidth).fill(null).map(() => Array(3).fill(0));
-const tileTex = new Image();
-if (tileTex instanceof HTMLElement) {
-  tileTex.src = "/img/bg/floor0.png";
-  tileTex.addEventListener("load", function () {
-    getTexture(tileTex, tileTexList, 3, texWidth, texHeight, bgTextures);
-  });
-}
-
-const firePlanksTexList = new Array(texWidth)
-  .fill(null)
-  .map(() => Array(3).fill(0));
-const firePlanksTex = new Image();
-if (firePlanksTex instanceof HTMLElement) {
-  firePlanksTex.src = "/img/bg/floor2.png";
-  firePlanksTex.addEventListener("load", function () {
-    getTexture(
-      firePlanksTex,
-      firePlanksTexList,
-      4,
-      texWidth,
-      texHeight,
-      bgTextures,
-    );
-  });
-}
-
-const planksTexList = new Array(texWidth)
-  .fill(null)
-  .map(() => Array(3).fill(0));
-const planksTex = new Image();
-if (planksTex instanceof HTMLElement) {
-  planksTex.src = "/img/bg/floor1.png";
-  planksTex.addEventListener("load", function () {
-    getTexture(planksTex, planksTexList, 2, texWidth, texHeight, bgTextures);
-  });
-}
-
-//walls
 function getTexture(
   tex: any,
   texList: number[][],
@@ -98,273 +39,149 @@ function getTexture(
   textures[index] = texList;
 }
 
-const wallTexList = new Array(texWidth).fill(null).map(() => Array(3).fill(0));
-const wallTex = new Image();
-if (wallTex instanceof HTMLElement) {
-  wallTex.src = "/img/walls/stone.png";
-  wallTex.addEventListener("load", function () {
-    getTexture(wallTex, wallTexList, 0, texWidth, texHeight, wallTextures);
-    getTexture(wallTex, wallTexList, 1, texWidth, texHeight, wallTextures);
-  });
+function addTexture(
+  path: string,
+  index: number,
+  texWidth: number,
+  texHeight: number,
+  textures: any[],
+) {
+  const texList = new Array(texWidth).fill(null).map(() => Array(3).fill(0));
+  const tex = new Image();
+  if (tex instanceof HTMLElement) {
+    tex.src = path;
+    tex.addEventListener("load", function () {
+      getTexture(tex, texList, index, texWidth, texHeight, textures);
+    });
+  }
 }
 
-const goalTexList = new Array(texWidth).fill(null).map(() => Array(3).fill(0));
-const goalTex = new Image();
-if (goalTex instanceof HTMLElement) {
-  goalTex.src = "/img/walls/goal.png";
-  goalTex.addEventListener("load", function () {
-    getTexture(goalTex, goalTexList, 3, texWidth, texHeight, wallTextures);
-  });
-}
+//bg
+addTexture("/img/bg/roof.png", 0, texWidth, texHeight, bgTextures);
+addTexture("/img/bg/roof1.png", 1, texWidth, texHeight, bgTextures);
+addTexture("/img/bg/floor0.png", 3, texWidth, texHeight, bgTextures);
+addTexture("/img/bg/floor1.png", 2, texWidth, texHeight, bgTextures);
+addTexture("/img/bg/floor2.png", 4, texWidth, texHeight, bgTextures);
 
-const fireBallWallTexList = new Array(texWidth)
-  .fill(null)
-  .map(() => Array(3).fill(0));
-const fireBallWallTex = new Image();
-if (fireBallWallTex instanceof HTMLElement) {
-  fireBallWallTex.src = "/img/walls/fireBallWall.png";
-  fireBallWallTex.addEventListener("load", function () {
-    getTexture(
-      fireBallWallTex,
-      fireBallWallTexList,
-      4,
-      texWidth,
-      texHeight,
-      wallTextures,
-    );
-  });
-}
+//walls
+addTexture("/img/walls/stone.png", 0, texWidth, texHeight, wallTextures);
+addTexture("/img/walls/stone.png", 1, texWidth, texHeight, wallTextures);
 
-const moveWallTexList = new Array(texWidth)
-  .fill(null)
-  .map(() => Array(3).fill(0));
-const moveWallTex = new Image();
-if (moveWallTex instanceof HTMLElement) {
-  moveWallTex.src = "/img/walls/moveWall.png";
-  moveWallTex.addEventListener("load", function () {
-    getTexture(
-      moveWallTex,
-      moveWallTexList,
-      5,
-      texWidth,
-      texHeight,
-      wallTextures,
-    );
-  });
-}
+addTexture("/img/walls/goal.png", 3, texWidth, texHeight, wallTextures);
 
-const closeWallTexList = new Array(texWidth)
-  .fill(null)
-  .map(() => Array(3).fill(0));
-const closeWallTex = new Image();
-if (closeWallTex instanceof HTMLElement) {
-  closeWallTex.src = "/img/walls/closeWall.png";
-  closeWallTex.addEventListener("load", function () {
-    getTexture(
-      closeWallTex,
-      closeWallTexList,
-      6,
-      texWidth,
-      texHeight,
-      wallTextures,
-    );
-  });
-}
+addTexture("/img/walls/fireBallWall.png", 4, texWidth, texHeight, wallTextures);
+addTexture("/img/walls/moveWall.png", 5, texWidth, texHeight, wallTextures);
 
-const break0TexList = new Array(texWidth)
-  .fill(null)
-  .map(() => Array(3).fill(0));
-const break0Tex = new Image();
-if (break0Tex instanceof HTMLElement) {
-  break0Tex.src = "/img/walls/break0.png";
-  break0Tex.addEventListener("load", function () {
-    getTexture(break0Tex, break0TexList, 9, texWidth, texHeight, wallTextures);
-  });
-}
+addTexture("/img/walls/closeWall.png", 6, texWidth, texHeight, wallTextures);
 
-const break1TexList = new Array(texWidth)
-  .fill(null)
-  .map(() => Array(3).fill(0));
-const break1Tex = new Image();
-if (break1Tex instanceof HTMLElement) {
-  break1Tex.src = "/img/walls/break1.png";
-  break1Tex.addEventListener("load", function () {
-    getTexture(break1Tex, break1TexList, 10, texWidth, texHeight, wallTextures);
-  });
-}
-
-const break2TexList = new Array(texWidth)
-  .fill(null)
-  .map(() => Array(3).fill(0));
-const break2Tex = new Image();
-if (break2Tex instanceof HTMLElement) {
-  break2Tex.src = "/img/walls/break2.png";
-  break2Tex.addEventListener("load", function () {
-    getTexture(break2Tex, break2TexList, 11, texWidth, texHeight, wallTextures);
-  });
-}
+addTexture("/img/walls/break0.png", 9, texWidth, texHeight, wallTextures);
+addTexture("/img/walls/break1.png", 10, texWidth, texHeight, wallTextures);
+addTexture("/img/walls/break2.png", 11, texWidth, texHeight, wallTextures);
 
 //sprites
-const fireBallTexList = new Array(spriteTexWidth)
-  .fill(null)
-  .map(() => Array(3).fill(0));
-const fireBallTex = new Image();
-if (fireBallTex instanceof HTMLElement) {
-  fireBallTex.src = "/img/sprites/fireball.png";
-  fireBallTex.addEventListener("load", function () {
-    getTexture(
-      fireBallTex,
-      fireBallTexList,
-      0,
-      spriteTexWidth,
-      spriteTexHeight,
-      spriteTextures,
-    );
-  });
-}
+addTexture(
+  "/img/sprites/fireball.png",
+  0,
+  spriteTexWidth,
+  spriteTexHeight,
+  spriteTextures,
+);
 
-const fireBallReflectTexList = new Array(spriteTexWidth)
-  .fill(null)
-  .map(() => Array(3).fill(0));
-const fireBallReflectTex = new Image();
-if (fireBallReflectTex instanceof HTMLElement) {
-  fireBallReflectTex.src = "/img/sprites/fireballReflect.png";
-  fireBallReflectTex.addEventListener("load", function () {
-    getTexture(
-      fireBallReflectTex,
-      fireBallReflectTexList,
-      1,
-      spriteTexWidth,
-      spriteTexHeight,
-      spriteTextures,
-    );
-  });
-}
+addTexture(
+  "/img/sprites/fireballReflect.png",
+  1,
+  spriteTexWidth,
+  spriteTexHeight,
+  spriteTextures,
+);
 
-const clockTexList = new Array(spriteTexWidth)
-  .fill(null)
-  .map(() => Array(3).fill(0));
-const clockTex = new Image();
-if (clockTex instanceof HTMLElement) {
-  clockTex.src = "/img/sprites/clock.png";
-  clockTex.addEventListener("load", function () {
-    getTexture(
-      clockTex,
-      clockTexList,
-      2,
-      spriteTexWidth,
-      spriteTexHeight,
-      spriteTextures,
-    );
-  });
-}
+addTexture(
+  "/img/sprites/clock.png",
+  2,
+  spriteTexWidth,
+  spriteTexHeight,
+  spriteTextures,
+);
 
-const mage0TexList = new Array(spriteTexWidth)
-  .fill(null)
-  .map(() => Array(3).fill(0));
-const mage0Tex = new Image();
-if (mage0Tex instanceof HTMLElement) {
-  mage0Tex.src = "/img/sprites/mage0.png";
-  mage0Tex.addEventListener("load", function () {
-    getTexture(
-      mage0Tex,
-      mage0TexList,
-      3,
-      spriteTexWidth,
-      spriteTexHeight,
-      spriteTextures,
-    );
-  });
-}
+addTexture(
+  "/img/sprites/mage0.png",
+  3,
+  spriteTexWidth,
+  spriteTexHeight,
+  spriteTextures,
+);
 
-const mage1TexList = new Array(spriteTexWidth)
-  .fill(null)
-  .map(() => Array(3).fill(0));
-const mage1Tex = new Image();
-if (mage1Tex instanceof HTMLElement) {
-  mage1Tex.src = "/img/sprites/mage1.png";
-  mage1Tex.addEventListener("load", function () {
-    getTexture(
-      mage1Tex,
-      mage1TexList,
-      4,
-      spriteTexWidth,
-      spriteTexHeight,
-      spriteTextures,
-    );
-  });
-}
+addTexture(
+  "/img/sprites/mage1.png",
+  4,
+  spriteTexWidth,
+  spriteTexHeight,
+  spriteTextures,
+);
 
-const slime0TexList = new Array(spriteTexWidth)
-  .fill(null)
-  .map(() => Array(3).fill(0));
-const slime0Tex = new Image();
-if (slime0Tex instanceof HTMLElement) {
-  slime0Tex.src = "/img/sprites/slime0.png";
-  slime0Tex.addEventListener("load", function () {
-    getTexture(
-      slime0Tex,
-      slime0TexList,
-      5,
-      spriteTexWidth,
-      spriteTexHeight,
-      spriteTextures,
-    );
-  });
-}
-const slime1TexList = new Array(spriteTexWidth)
-  .fill(null)
-  .map(() => Array(3).fill(0));
-const slime1Tex = new Image();
-if (slime1Tex instanceof HTMLElement) {
-  slime1Tex.src = "/img/sprites/slime1.png";
-  slime1Tex.addEventListener("load", function () {
-    getTexture(
-      slime1Tex,
-      slime1TexList,
-      6,
-      spriteTexWidth,
-      spriteTexHeight,
-      spriteTextures,
-    );
-  });
-}
+addTexture(
+  "/img/sprites/mage2.png",
+  5,
+  spriteTexWidth,
+  spriteTexHeight,
+  spriteTextures,
+);
 
-const slime2TexList = new Array(spriteTexWidth)
-  .fill(null)
-  .map(() => Array(3).fill(0));
-const slime2Tex = new Image();
-if (slime2Tex instanceof HTMLElement) {
-  slime2Tex.src = "/img/sprites/slime2.png";
-  slime2Tex.addEventListener("load", function () {
-    getTexture(
-      slime2Tex,
-      slime2TexList,
-      7,
-      spriteTexWidth,
-      spriteTexHeight,
-      spriteTextures,
-    );
-  });
-}
+addTexture(
+  "/img/sprites/mage3.png",
+  6,
+  spriteTexWidth,
+  spriteTexHeight,
+  spriteTextures,
+);
 
-// const boss0TexList = new Array(spriteTexWidth)
-//   .fill(null)
-//   .map(() => Array(3).fill(0));
-// const boss0Tex = new Image();
-// if (boss0Tex instanceof HTMLElement) {
-//   boss0Tex.src = "/img/sprites/boss1.png";
-//   boss0Tex.addEventListener("load", function () {
-//     getTexture(
-//       boss0Tex,
-//       boss0TexList,
-//       5,
-//       spriteTexWidth,
-//       spriteTexHeight,
-//       spriteTextures,
-//     );
-//   });
-// }
+addTexture(
+  "/img/sprites/mage4.png",
+  7,
+  spriteTexWidth,
+  spriteTexHeight,
+  spriteTextures,
+);
+
+addTexture(
+  "/img/sprites/slime0.png",
+  8,
+  spriteTexWidth,
+  spriteTexHeight,
+  spriteTextures,
+);
+
+addTexture(
+  "/img/sprites/slime1.png",
+  9,
+  spriteTexWidth,
+  spriteTexHeight,
+  spriteTextures,
+);
+
+addTexture(
+  "/img/sprites/slime2.png",
+  10,
+  spriteTexWidth,
+  spriteTexHeight,
+  spriteTextures,
+);
+
+addTexture(
+  "/img/sprites/slime3.png",
+  11,
+  spriteTexWidth,
+  spriteTexHeight,
+  spriteTextures,
+);
+
+addTexture(
+  "/img/sprites/slime4.png",
+  12,
+  spriteTexWidth,
+  spriteTexHeight,
+  spriteTextures,
+);
 
 //items
 const flashlightImg = new Image();
