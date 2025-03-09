@@ -2,7 +2,8 @@ import { Fireball } from "./fireball";
 import { levelSettings } from "./levels";
 import { Teleport } from "./player";
 import { Slime, Mage } from "./enemy";
-import { pos } from "./global";
+import { SpikeBall } from "./spikeball";
+
 interface sprite {
   x: number;
   y: number;
@@ -94,6 +95,10 @@ function spriteUpdate(ls: levelSettings) {
       if (!sprite.type.alive) {
         ls.sprites.splice(i, 1);
       }
+    } else if (ls.sprites[i].type instanceof SpikeBall) {
+      sprite.type.update();
+      sprite.x = sprite.type.x;
+      sprite.y = sprite.type.y;
     }
   }
 }

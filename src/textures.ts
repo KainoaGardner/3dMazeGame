@@ -12,7 +12,7 @@ const wallTextures = new Array(12)
 
 const bgTextures = new Array(5).fill(null).map(() => Array(texWidth).fill(0));
 
-const spriteTextures = new Array(11)
+const spriteTextures = new Array(16)
   .fill(null)
   .map(() => Array(spriteTexWidth).fill(0));
 
@@ -178,6 +178,30 @@ addTexture(
 addTexture(
   "/img/sprites/slime4.png",
   12,
+  spriteTexWidth,
+  spriteTexHeight,
+  spriteTextures,
+);
+
+addTexture(
+  "/img/sprites/spikeball.png",
+  13,
+  spriteTexWidth,
+  spriteTexHeight,
+  spriteTextures,
+);
+
+addTexture(
+  "/img/sprites/ghost0.png",
+  14,
+  spriteTexWidth,
+  spriteTexHeight,
+  spriteTextures,
+);
+
+addTexture(
+  "/img/sprites/ghost1.png",
+  15,
   spriteTexWidth,
   spriteTexHeight,
   spriteTextures,

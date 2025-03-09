@@ -238,64 +238,62 @@ export class Mage extends Enemy {
     health: number,
     fireballSpeed: number,
     shootTimer: number,
+    agroDist: number,
     shootCount: number = 0,
   ) {
-    super(x, y, health);
+    super(x, y, health, 0, agroDist);
     this.fireballSpeed = fireballSpeed;
     this.shootTimer = shootTimer;
     this.shootCount = shootCount;
   }
 
   update(ls: levelSettings) {
-    if (this.shootCount >= this.shootTimer) {
-      const xDif = ls.player.posX - this.x + (Math.random() * 1 - 0.5);
-      const yDif = ls.player.posY - this.y + Math.random() * 1 - 0.5;
-      const angle = Math.atan2(yDif, xDif);
-      const xVel = this.fireballSpeed * Math.cos(angle);
-      const yVel = this.fireballSpeed * Math.sin(angle);
+    const distance = Math.sqrt(
+      (this.x - ls.player.posX) * (this.x - ls.player.posX) +
+        (this.y - ls.player.posY) * (this.y - ls.player.posY),
+    );
 
-      const fireball = new Fireball(this.x, this.y, xVel, yVel);
-      const sprite = { x: this.x, y: this.y, texture: 0, type: fireball };
-      ls.sprites.push(sprite);
+    if (distance < this.agroDist) {
+      this.shootCount++;
+      if (this.shootCount >= this.shootTimer) {
+        const xDif = ls.player.posX - this.x + (Math.random() * 1 - 0.5);
+        const yDif = ls.player.posY - this.y + Math.random() * 1 - 0.5;
+        const angle = Math.atan2(yDif, xDif);
+        const xVel = this.fireballSpeed * Math.cos(angle);
+        const yVel = this.fireballSpeed * Math.sin(angle);
+
+        const fireball = new Fireball(this.x, this.y, xVel, yVel);
+        const sprite = { x: this.x, y: this.y, texture: 0, type: fireball };
+        ls.sprites.push(sprite);
+        this.shootCount = 0;
+      }
+    } else {
       this.shootCount = 0;
     }
-    this.shootCount++;
   }
 }
 
-// export class Lurker {
-//   x: number;
-//   y: number;
-//   velX: number;
-//   velY: number;
-//   alive: boolean = true;
-//   reflect: boolean = false;
-//
-//   constructor(x: number, y: number, velX: number, velY: number) {
-//     this.x = x;
-//     this.y = y;
-//     this.velX = velX;
-//     this.velY = velY;
-//   }
-//
-//   update(map: number[][]) {
-//     const blockY = Math.floor(this.x);
-//     const blockX = Math.floor(this.y);
-//
-//     if (
-//       this.x >= 0 &&
-//       this.x < map.length &&
-//       this.y >= 0 &&
-//       this.y < map[0].length &&
-//       (map[blockY][blockX] === 0 || map[blockY][blockX] === 5)
-//     ) {
-//       this.x += this.velX;
-//       this.y += this.velY;
-//     } else {
-//       this.alive = false;
-//     }
-//   }
-// }
+export class Ghost {
+  x: number;
+  y: number;
+  speed: number;
+
+  constructor(x: number, y: number, speed: number) {
+    this.x = x;
+    this.y = y;
+    this.speed = speed;
+  }
+
+  update(ls: levelSettings) {}
+
+  // takeDamage(damage: number) {
+  //   this.health -= damage;
+  //   this.hurtCounter = 1;
+  //   if (this.health <= 0) {
+  //     this.deadCounter = 1;
+  //   }
+  // }
+}
 
 // export class Tank {
 //   x: number;

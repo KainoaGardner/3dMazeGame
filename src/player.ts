@@ -165,11 +165,8 @@ export class Player {
           const green = buffer[i][j][1];
           const blue = buffer[i][j][2];
           const color = `rgb(${red} ${green} ${blue})`;
-          c.globalAlpha = 1;
           c.fillStyle = color;
-          if (red === 0 && green === 148 && blue === 255) {
-            c.globalAlpha = 0.8;
-          }
+
           c.fillRect(
             j * bufferRatio,
             i * bufferRatio,
@@ -1822,6 +1819,7 @@ export class Player {
   private damageEnemy(ls: levelSettings) {
     for (let i = 0; i < ls.sprites.length; i++) {
       const sprite = ls.sprites[i].type;
+      if (sprite === undefined) continue;
       const invDet = 1 / (this.planeX * this.dirY - this.dirX * this.planeY);
       const spriteX = sprite.x - this.posX;
       const spriteY = sprite.y - this.posY;
